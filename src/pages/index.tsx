@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 
 import { api } from "@/utils/api";
+import { LoadingPage } from "@/components/loading";
 
 const CreatePostWizard = () => {
   return (
@@ -15,13 +16,11 @@ const CreatePostWizard = () => {
 };
 
 const Home: NextPage = () => {
-  // const { data, isLoading } = api.posts.getAll.useQuery();
+  const { data, isLoading } = api.posts.getAll.useQuery();
 
-  // if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingPage />;
 
-  // if (!data) return <div>Something Went Wrong</div>;
-
-  const { data } = api.posts.getAll.useQuery();
+  if (!data) return <div>Something Went Wrong</div>;
 
   return (
     <>
@@ -36,7 +35,7 @@ const Home: NextPage = () => {
             <CreatePostWizard></CreatePostWizard>
           </div>
           <div className="flex flex-col">
-            {data?.map((post) => (
+            {[...data, ...data]?.map((post) => (
               <div key={post.id} className="border-b border-slate-400 p-8">
                 {post.content}
               </div>
