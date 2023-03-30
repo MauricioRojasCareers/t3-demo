@@ -14,7 +14,7 @@ export const postRouter = createTRPCRouter({
   makePost: publicProcedure
     .input(
       z.object({
-        postBody: z.string(),
+        postBody: z.string().emoji(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -22,6 +22,16 @@ export const postRouter = createTRPCRouter({
       return await ctx.prisma.post.create({
         data: {
           content: input.postBody,
+        },
+      });
+    }),
+
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.post.delete({
+        where: {
+          id: input.id,
         },
       });
     }),

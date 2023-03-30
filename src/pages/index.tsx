@@ -1,14 +1,17 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import { api } from "@/utils/api";
+import { api, type RouterOutputs } from "@/utils/api";
 import { LoadingPage, LoadingSpinner } from "@/components/loading";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { HiDotsHorizontal } from "react-icons/hi";
+import { FiDelete } from "react-icons/fi";
+import { toast } from "react-hot-toast";
 
 type FormValues = {
   postBody: string;
 };
+
+type Post = RouterOutputs["posts"]["getAll"][0];
 
 const CreatePostWizard = () => {
   // Grab context
@@ -18,6 +21,9 @@ const CreatePostWizard = () => {
   const { mutate, isLoading: isPosting } = api.posts.makePost.useMutation({
     onSuccess: () => {
       void ctx.posts.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Failed to Post! We only accept Emojis 😂");
     },
   });
 
@@ -37,7 +43,7 @@ const CreatePostWizard = () => {
         <div className="m-5 border-b">
           <input
             placeholder="What's happening?"
-            className="h-20 w-full bg-transparent outline-none"
+            className="h-20 w-full  bg-transparent outline-none"
             {...register("postBody", { required: true })}
             disabled={isPosting}
           ></input>
@@ -65,9 +71,20 @@ const CreatePostWizard = () => {
   );
 };
 
-const MoreInfo = () => {
-  return <div></div>;
-};
+// const MoreInfo = () => {
+
+//   return (
+//     <div className="absolute right-0 mr-8">
+//       <button
+//         onClick={() => {
+//           console.log("You deleted this!", );
+//         }}
+//       >
+//         <FiDelete />
+//       </button>
+//     </div>
+//   );
+// };
 
 const Home: NextPage = () => {
   const { data, isLoading } = api.posts.getAll.useQuery();
@@ -96,7 +113,7 @@ const Home: NextPage = () => {
                 className="relative flex flex-row border-b border-slate-400  p-8"
               >
                 {post.content}
-                <MoreInfo></MoreInfo>
+                {/* <MoreInfo></MoreInfo> */}
               </div>
             ))}
           </div>
