@@ -1,8 +1,23 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
+  getById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: { id: input.id },
+      });
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+      return post;
+    }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       take: 100,
@@ -14,11 +29,10 @@ export const postRouter = createTRPCRouter({
   makePost: publicProcedure
     .input(
       z.object({
-        postBody: z.string().emoji(),
+        postBody: z.string().emoji("Only Emojis Are Allowed"),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(input, "from backend");
       return await ctx.prisma.post.create({
         data: {
           content: input.postBody,
